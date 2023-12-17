@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import axios from 'axios'
 import { useUserContext } from '../context/UserContext'
-
+import {toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
+import Spinner from './Spinner'
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
 function Login() {
@@ -23,7 +25,7 @@ function Login() {
       })
       setIsLogging(false)
       if (res.data) {
-        alert('Successfully Loggedin')
+        toast.success("Logged In Successfully!!")
         // setting user context state by the logged in user details
         setUser(res.data.user)
         // emptying login form after login
@@ -32,7 +34,7 @@ function Login() {
         setLoggedIn(true)
       }
     } catch (err) {
-      alert('Login Failed, Please check your email & password')
+      toast.error('Login Failed, Please check your email & password')
       setIsLogging(false)
     }
   }
@@ -41,7 +43,8 @@ function Login() {
     // if successfully logged in then redirect to homepage
     return <Navigate to={'/'} />
   }
-
+  if(isLogging) 
+    return <Spinner />
   return (
     <div className="mt-20">
       <h1 className="text-3xl text-center">Login</h1>

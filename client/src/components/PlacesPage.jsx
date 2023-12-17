@@ -3,6 +3,8 @@ import { Link, Navigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid' // for generating unique key values
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
@@ -35,7 +37,7 @@ function PlacesPage() {
     try {
       // destructuring data from res and renaming it into filename
       const { data: filename } = await axios.post(
-        `${SERVER_URL}/api/upload-image-link`,
+      `${SERVER_URL}/api/upload-image-link`,
         {
           imageURL: photoLink,
         }
@@ -114,6 +116,7 @@ function PlacesPage() {
       const res = await axios.post(`${SERVER_URL}/api/places`, data)
     }
     setRedirect(true)
+    toast.success("Place added Succesfully")
   }
 
   // this function removed the uploaded photo, after that pressing save is required

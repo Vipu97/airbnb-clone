@@ -5,6 +5,8 @@ import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
 import PlacesPage from './PlacesPage'
 import BookingsPage from './BookingsPage'
+import {toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
@@ -46,6 +48,7 @@ function AccountPage() {
 
   // redirection to main page on successful logout
   if (redirect == '/') {
+    toast.success('Logout Successfully!!')
     return <Navigate to={'/'} />
   }
 

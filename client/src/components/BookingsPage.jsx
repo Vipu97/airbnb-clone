@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { differenceInCalendarDays } from 'date-fns'
 import { Link } from 'react-router-dom'
+import {toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
+import Spinner from './Spinner'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
 // This page display all the bookings done by the logged in user inside My Bookings Tab
 function BookingsPage() {
   const [bookings, setBookings] = useState([])
+  const [loadingBookings,setLoadingBookings] = useState(true)
 
   async function cancelBooking(id) {
     try {
@@ -15,24 +19,27 @@ function BookingsPage() {
       console.log(res.data)
       await fetchBookings()
       if (res.data) {
-        alert('Successfully cancelled the booking')
+        toast.info('Successfully cancelled the booking')
       }
     } catch (error) {
       console.log(error.message)
-      alert('Something went wrong')
+      toast.info('Something went wrong')
     }
+    
   }
 
   async function fetchBookings() {
     const res = await axios.get(`${SERVER_URL}/api/bookings`)
     setBookings(res.data)
+    setLoadingBookings(false)
   }
 
   // this will fetch all the bookings for the logged in user
   useEffect(() => {
     fetchBookings()
   }, [])
-
+  if(loadingBookings)
+    return <Spinner />
   return (
     <div>
       <div className="mt-6 max-w-[900px] mx-auto p-4">

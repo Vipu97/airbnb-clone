@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import BookingWidget from './BookingWidget'
+import Spinner from './Spinner'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
@@ -9,6 +10,7 @@ function Place() {
   const { id } = useParams() // getting the id of the place
   const [place, setPlace] = useState({})
   const [showAllPhotos, setShowAllPhotos] = useState(false)
+  const [loadingPlaceDetails,setLoadingPlaceDetails] = useState(false)
 
   useEffect(() => {
     if (!id) {
@@ -16,16 +18,19 @@ function Place() {
     }
     async function fetchPlaceDetails() {
       // fetching place details using id
+      setLoadingPlaceDetails(true)
       const { data: placeData } = await axios.get(
         `${SERVER_URL}/api/places/${id}`
       )
       setPlace(placeData)
+      setLoadingPlaceDetails(false)
     }
-
     fetchPlaceDetails()
   }, [id])
 
   // rendering all photos
+  if(loadingPlaceDetails)
+    return <Spinner />
   if (showAllPhotos) {
     return (
       <div className="min-w-full min-h-screen bg-white relative">

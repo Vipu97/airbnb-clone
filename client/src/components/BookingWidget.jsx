@@ -3,6 +3,8 @@ import { differenceInCalendarDays } from 'date-fns'
 import axios from 'axios'
 import { Navigate } from 'react-router-dom'
 import { useUserContext } from '../context/UserContext'
+import {toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
@@ -23,35 +25,34 @@ function BookingWidget({ place }) {
 
   async function bookPlace() {
     const totalPrice = place.price * bookedDays
-
     if (!(name && email && phone)) {
-      alert('Please provide your details')
+      if(!name)
+        toast.warning('Name is required for booking')
+      else if(!email)
+        toast.warning('Email is required for booking')
+      else if(!phone)
+        toast.warning('Phone Number is required for booking')
       return
     }
-    // checking if all characters are number or not
     if (isNaN(phone)) {
-      alert('Please provide valid phone number')
+      toast.warning('Please provide valid phone number')
       return
     }
-
-    // book place (send request to backend)
     try {
-      const res = await axios.post(`${SERVER_URL}/api/bookings`, {
-        place: place._id,
-        checkIn,
-        checkOut,
-        noOfGuests,
-        name,
-        email,
-        phone,
-        price: totalPrice,
-      })
-
+      const res = await axios.post(`${SERVER_URL}/api/bookings`, { place: place._id,checkIn,checkOut, noOfGuests, name, email, phone,price: totalPrice,})
       if (!res.data) {
-        alert('Please Login')
+        toast.warning('Please Login before Booking')
         return
       } else {
-        alert('Successfully Booked')
+        toast.success('Successfully Booked')
+        const body = "Your Destination is Successfully booked.Thanks! for using HomeStays"
+        const to = `+91${phone}`
+        try {
+          const response = await axios.post(`${SERVER_URL}/api/send`, {to, body });
+          console.log(response.data);
+        } catch (error) {
+          console.error(error);
+        }
         setRedirect(true)
       }
     } catch (err) {
@@ -71,7 +72,7 @@ function BookingWidget({ place }) {
     if (checkIn && checkOut) {
       if (checkOut <= checkIn) {
         setCheckOut('')
-        alert(`You can't set same / past date as checkout date`)
+        toast.warning(`You can't set same / past date as checkout date`)
         return
       }
       setBookedDays(
@@ -87,9 +88,9 @@ function BookingWidget({ place }) {
 
   return (
     <div className="border-2 border-black rounded-xl max-w-[400px] shadow relative lg:top-[-40%] lg:left-[15%] bg-white">
-      <div id="top" className="flex justify-between p-4">
+      <div id="top" className="flex justify-around py-4">
         <div className="text-lg">
-          <span className="font-medium">${place.price} </span>night
+          <span className="font-medium">₹ {place.price} </span> per night
         </div>
         <div className="flex items-center gap-2">
           <div className="flex gap-1 items-center">
@@ -107,7 +108,6 @@ function BookingWidget({ place }) {
             </svg>
             <p>4.6</p>
           </div>
-          <div className="text-gray-500">101 reviews</div>
         </div>
       </div>
 
@@ -158,11 +158,15 @@ function BookingWidget({ place }) {
         <button
           className="primary"
           onClick={() => {
-            if (
-              !(checkIn && checkOut && noOfGuests) ||
-              noOfGuests > place.maxGuests
-            ) {
-              alert('Please provide valid details')
+            if (!(checkIn && checkOut && noOfGuests) || noOfGuests > place.maxGuests) {
+              if(!checkIn)
+                toast.warning('Please provide CheckIn Date')
+              else if(!checkOut)
+                toast.warning('Please provide CheckOut Date')
+              else if(!noOfGuests)
+                toast.warning('Please provide the number of Guests')
+              else if(noOfGuests > place.maxGuests)
+                toast.warning(`Max ${place.maxGuests} Guests are allowed`)
               return
             } else {
               setShowForm(!showForm)
@@ -231,7 +235,7 @@ function BookingWidget({ place }) {
 
       <div className="w-[90%] mx-auto border-2 border-black mb-4"></div>
       <div className="w-[200px] mx-auto text-center mb-3 font-medium text-xl">
-        Total : ${place.price * bookedDays}
+        Total : ₹ {place.price * bookedDays}
       </div>
     </div>
   )

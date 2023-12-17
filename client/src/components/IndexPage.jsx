@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
+import Spinner from './Spinner'
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
@@ -16,7 +17,9 @@ function IndexPage() {
     }
     getAllPlaces()
   }, [])
-
+  
+  if(places.length === 0)
+    return <Spinner />
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 mt-8">
       {/* Rendering all available places in the index page */}
@@ -36,7 +39,7 @@ function IndexPage() {
             <h2 className="font-bold truncate">{place.title}</h2>
             <h3 className="text-gray-500">{place.address}</h3>
             <p className="mt-1">
-              <span className="font-medium">${place.price}</span> night
+              <span className="font-medium">₹ {place.price}</span> per night
             </p>
           </Link>
         ))}

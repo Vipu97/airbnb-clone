@@ -31,16 +31,7 @@ router
   })
   .post(async (req, res) => {
     try {
-      const {
-        place,
-        checkIn,
-        checkOut,
-        noOfGuests,
-        name,
-        email,
-        phone,
-        price,
-      } = req.body
+      const {place, checkIn, checkOut, noOfGuests,  name, email, phone,price,} = req.body
       const { token } = req.cookies
 
       if (token) {
@@ -53,17 +44,8 @@ router
               throw err
             }
             // creating booking doc in the db
-            const booking = await Booking.create({
-              user: userDoc.id,
-              place,
-              checkIn,
-              checkOut,
-              noOfGuests,
-              name,
-              email,
-              phone,
-              price,
-            })
+            const booking = await Booking.create({user: userDoc.id,place, checkIn, checkOut, noOfGuests,
+              name,email,phone,price })
             res.json(booking)
           }
         )

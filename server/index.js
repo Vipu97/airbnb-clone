@@ -14,7 +14,7 @@ const fs = require('fs')
 const placeRouter = require('./routes/PlaceRouter')
 const BookingRouter = require('./routes/BookingRouter')
 
-const FRONTEND_URL = process.env.FRONTEND_URL
+const {client,twilioNumber} = require('./twilio')
 const uri = process.env.DB_CONNECTION_STRING;
 const bcryptSalt = bcrypt.genSaltSync(10)
 
@@ -48,7 +48,7 @@ app.use(cors({
   credentials: true,
   origin: 'http://localhost:5173'
 }))
-console.log(process.env.DB_CONNECTION_STRING)
+//console.log(process.env.DB_CONNECTION_STRING)
 // middleware used to parse the request body
 app.use(express.json())
 
@@ -224,6 +224,16 @@ app.get('/api/allplaces', async (req, res) => {
   }
 })
 
+app.post('/api/send',async (req,res) => {
+  const { to, body } = req.body;
+  try {
+    const message = await client.messages.create({body, from: twilioNumber, to});
+    res.json({ success: true, message });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Failed to send message'+error.message});
+  }
+})
 app.get('*', (req, res) => {
   res.send('Invalid Request')
 })
